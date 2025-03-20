@@ -1,0 +1,49 @@
+###  最長片道切符の旅 ####
+
+datas = {}  # データをこれに格納
+
+def add_line(start, end, distance):  # 各経路情報を追加
+    if start not in datas: # 新しい駅が登録された時(スタート側)
+        datas[start] = [] 
+    if end not in datas:   # 新しい駅が登録された時(ゴール側)
+        datas[end] = []
+    datas[start].append((end, distance))  # スタート, ゴールの両側から計算できるように登録
+    datas[end].append((start, distance))  
+
+def all_route(node, visited, route, t_distance, max_info):   #全部の経路を探索
+    visited.add(node) #ノードを訪問済みにする
+    route.append(node) #ノードを経路に含める
+    if t_distance > max_info[0]:
+        max_info[0],max_info[1] = t_distance, route.copy()
+
+    for n, distance in datas[node]:  #　隣接ノードまでの距離を取得　※ n：隣の駅
+        if n not in visited:
+            all_route(n, visited, route, (t_distance + distance), max_info)
+    route.pop()
+    visited.remove(node)
+
+def find_route():   #最長経路の探索
+    max_info = [0, []] 
+    for node in datas:
+        all_route(node, set(), [], 0, max_info)
+
+    return max_info[1]
+
+# データの入力
+while True:
+    try:
+        line = input().strip()
+        if not line:
+            break
+        parts = line.split()
+        start, end, distance = int(parts[0]), int(parts[1]), float(parts[2])
+        add_line(start, end, distance)
+    except EOFError:
+        break
+
+long_route = find_route()   # 最長経路の計算
+
+
+for i in long_route:  # 出力
+    print(i)
+
